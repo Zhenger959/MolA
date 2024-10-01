@@ -2,12 +2,20 @@
  * @Author: Jiaxin Zheng
  * @Date: 2024-10-01 19:19:48
  * @LastEditors: Jiaxin Zheng
- * @LastEditTime: 2024-10-01 19:56:53
+ * @LastEditTime: 2024-10-01 21:09:40
  * @Description: 
 -->
 
-# MolA
-Numerous pharmaceutical applications critically depend on the precise recognition of Optical Chemical Structures (OCSR) extracted from 2D image data. This study tackles the challenge of sub-optimal OCSR accuracy by shifting the focus from achieving perfect recognition to reducing the manual labor required for verification and correction. We introduce a novel set of metrics to quantify the labor cost associated with refining model predictions. Among these, the most demanding is the Perfectly-Matched Annotation Accuracy (PMAA), which demands exactitude not only in atom text but also in atom coordinates and bond types. A pivotal component of our research is the development and deployment of a comprehensively annotated training dataset consisting of 2,504,937 patent images. Complementarily, we prepare an independent test dataset, Annotated-USPTO, encompassing 1,325 unique patent images for unbiased evaluation. Our proposed model, MolA, prioritizes the reduction of manual intervention while maintaining robust OCSR performance. In comparative analysis, MolA significantly enhances the PMAA metric from 3.85% to 89.74% on the Annotated-USPTO dataset, surpassing the current state-of-the-art OCSR model, MolScribe. This study demonstrates that MolA, optimized with a high-quality training dataset, represents a substantial advancement in aligning OCSR technology with practical pharmaceutical applications.
+# MolA: Optimizing Optical Chemical Structure Recognition with Advanced Metrics and a Comprehensively-Annotated Patent Dataset
+
+This project addresses the limitations of achieving 100% accuracy in Optical Chemical Structure Recognition (OCSR) by focusing on reducing manual labor costs.
+
+Key Contributions:
+- **New Metrics**: Introduced Perfectly-Matched Annotation Accuracy (PMAA) to evaluate labor costs for verifying and correcting model outputs.
+- **Large-Scale Dataset**: Compiled a comprehensive dataset of 2.5 million annotated patent images, alongside an independent test set, Annotated-USPTO, with 1,325 images.
+- **MolA Model**: Our model significantly improves PMAA from 3.85% to 89.74%, surpassing MolScribe and minimizing manual intervention.
+
+MolA effectively addresses issues such as atom misclassification and incorrect bond predictions, providing a robust solution for pharmaceutical OCSR applications by reducing operational burdens and enhancing accuracy.
 
 
 # Quick Start
@@ -22,4 +30,25 @@ conda activate mola
 
 # install requirements
 pip install -r requirements.txt
+```
+Certainly! Here's the revised version with corrected grammar:
+
+# Data
+
+We provide the Annotated-USPTO dataset, which includes 1,325 images and their corresponding annotation file. Additionally, our large-scale training dataset and its annotation file are available. The corresponding TIFF files can be downloaded from the USPTO website.
+
+# Training
+
+We provide the training code so you can train your model:
+
+```
+bash scripts/train.sh
+```
+ 
+
+# Inference
+
+To perform inference using our model, simply run the following command:
+```
+bash scripts/eval.sh
 ```

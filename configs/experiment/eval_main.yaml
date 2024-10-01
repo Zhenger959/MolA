@@ -1,0 +1,98 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - override /data: mola_test
+  - override /model: mola
+  # - override /trainer: default
+  - override /trainer: cpu
+  - override /logger: tensorboard
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags: ["ocsr","demo", "char_coords","edges","prop"]
+
+seed: 1
+
+data:
+  batch_size: 32
+  train:
+    dynamic:
+      file: []
+    non_dynamic:
+      file: []
+  val:
+    non_dynamic:
+      file: []
+  test:
+    non_dynamic:
+      file: [uspto/test.csv]
+  tokenizer:
+    swap_token: False
+    coord_bins: 64
+    atom_only: False
+
+model:
+  automatic_optimization: False
+  gradient_clip_val: 5
+  fp16: True
+  freeze_net: ''
+  encoder:
+    args:
+      pretrained:  True
+      use_checkpoint: False
+      encoder: swin_base  # swin_base  swin_base_patch4_window12_384
+  decoder:
+    args:
+      compute_confidence: True
+      tokenizer:
+        swap_token: False
+        coord_bins: 64
+        atom_only: False
+      atom_predictor:
+        tokenizer:
+          swap_token: False
+          coord_bins: 64
+          atom_only: False
+      # edge_predictor:
+      #   cls_num: 28
+  loss:
+    atom_loss:
+      tokenizer:
+        swap_token: False
+        coord_bins: 64
+        atom_only: False
+    loss_weight:
+      chartok_coords: 2
+      edges: 1
+      atom_prop: 1
+    # edge_loss:
+    #   cls_num: 28
+  # encoder_updare_freq: 2
+
+# encoder_optimizer:
+#   lr: 4e-5
+
+trainer:
+  precision: 16-mixed
+  devices: 1
+  detect_anomaly: False
+  # gradient_clip_val: 1.0
+
+  min_epochs: 1 # prevents early stopping
+  max_epochs: 30
+  strategy: ddp_find_unused_parameters_true
+  
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "ocsr"
+  aim:
+    experiment: "ocsr"
+  
+
+ckpt_path: null

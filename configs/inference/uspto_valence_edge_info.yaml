@@ -1,0 +1,115 @@
+_target_: src.models.ocsr_module.OCSRLitModule
+
+aprop_cls_name: [atom_prop,valence,degree,num_Hs_total,num_Hs_implicit]
+warmup: 0.02
+
+root_dir: ${oc.env:PROJECT_ROOT}
+
+post_processer:
+  _target_: src.utils.BasePostprocessor
+  formats: [chartok_coords,edges]  # atom_prob
+  molblock: False
+  keep_main_molecule: False
+
+evaluator:
+  _target_: src.utils.SmilesEvaluator
+  num_workers: 16
+  tanimoto: True
+
+encoder:
+  _target_: src.models.components.encoder.Encoder
+  args:
+    encoder: swin_base_patch4_window12_384
+    use_checkpoint: True
+    pretrained:  False
+
+decoder:
+  _target_: src.models.components.decoder.Decoder
+  args:
+    max_len: 480
+    compute_confidence: False
+    edge_cls_num: 29
+    formats: [chartok_coords,edge_infos,atom_prop] 
+    atom_predictor:
+      _target_: src.models.components.atom_decoder.AtomPredictor
+      args:
+        encoder_dim: 1024
+        enc_pos_emb: False
+        dec_hidden_size: 256
+        dec_num_layers: 6
+        dec_attn_heads: 8
+        hidden_dropout: 0.1
+        attn_dropout: 0.1
+        self_attn_type: 'scaled-dot'
+        max_relative_positions: 0
+        ckpt_path: ''
+
+        output_constraint: True
+      tokenizer:
+        _target_: src.tokenizer.CharTokenizer
+        coord_bins: 64
+        path: ${root_dir}/src/vocab/vocab_chars.json
+        sep_xy: True
+        continuous_coords: False
+    edge_info_predictor:
+      _target_: src.models.components.edge_decoder.EdgeInfoImgAttnPredictor
+      encoder_dim: 1024
+      decoder_dim: 256
+      order_cls_num: 17
+      display_cls_num: 15
+    atom_bbox_predictor: ''
+    atom_prop_predictor:
+      _target_: src.models.components.atom_decoder.AtomPropPredictor
+      encoder_dim: 1024
+      decoder_dim: 256
+      cls_num: 16
+      prop_name: atoms_valence_before
+    graph_net: ''
+    edge_predictor: ''
+
+encoder_optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 4e-4
+  weight_decay: 1e-6
+  amsgrad: False
+
+decoder_optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 4e-4
+  weight_decay: 1e-6
+  amsgrad: False
+
+# warmup: 0.02 # unuse
+# num_warmup_steps: ${num_training_steps}*${warmup_ratio}
+encoder_scheduler:
+  _target_: transformers.optimization.get_cosine_schedule_with_warmup
+  _partial_: true
+
+decoder_scheduler:
+  _target_: transformers.optimization.get_cosine_schedule_with_warmup
+  _partial_: true
+
+loss:
+  _target_: src.loss.net_loss.Criterion
+
+  atom_loss:
+    _target_: src.loss.SequenceLoss
+    tokenizer:
+      _target_: src.tokenizer.CharTokenizer
+      coord_bins: 64
+      path: ${root_dir}/src/vocab/vocab_chars.json
+      sep_xy: True
+      continuous_coords: False
+    label_smoothing: 0.1
+    # vocab_size: 229
+    ignore_index: 0
+    ignore_indices: [0, 4]
+  edge_info_loss:
+    _target_: src.loss.EdgeInfoLoss
+    bond_order_cls_num: 17
+    bond_display_cls_num: 15
+  atom_prop_loss:
+    _target_: src.loss.AtomPropCriterion
+    ignore_index: -1

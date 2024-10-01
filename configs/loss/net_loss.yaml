@@ -1,0 +1,25 @@
+PAD: '<pad>'
+SOS: '<sos>'
+EOS: '<eos>'
+UNK: '<unk>'
+MASK: '<mask>'
+PAD_ID: 0
+SOS_ID: 1
+EOS_ID: 2
+UNK_ID: 3
+MASK_ID: 4
+
+has_mask: True
+
+
+_target_: src.loss.net_loss.Criterion
+args:
+  formats: [chartok_coords,edges]
+  atom_loss:
+    core_method: token_loss
+    class: SequenceLoss
+    args:
+      label_smoothing: 0.1
+      vocab_size: 229
+      ignore_index: ${PAD_ID}
+      ignore_indices: ['${PAD_ID}', '${MASK_ID}']

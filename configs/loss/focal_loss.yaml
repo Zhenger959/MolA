@@ -1,0 +1,7 @@
+_target_: src.loss.focal_loss.FocalLoss
+args:
+  alpha: 0.25
+  gamma: 2
+  reduction: mean
+  ignore_index: -100
+  ignore_indices: []

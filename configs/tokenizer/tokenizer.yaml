@@ -1,0 +1,10 @@
+root_dir: ${oc.env:PROJECT_ROOT}
+tokenizer:
+    _target_: src.tokenizer.CharTokenizer
+    path: ${root_dir}/src/vocab/vocab_chars.json
+    coord_bins: 64
+    sep_xy: True
+    continuous_coords: False
+    max_len: 480
+    mask_ratio: 0
+    swap_token: Ture

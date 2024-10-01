@@ -1,0 +1,7 @@
+image_transform:
+    _target_: src.utils.data_utils.augment_utils.get_transforms
+    input_size:  384
+    augment: False
+    rotate: False  # True
+    debug: False
+    deformation: False

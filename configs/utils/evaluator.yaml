@@ -1,0 +1,10 @@
+post_processer:
+  _target_: src.utils.BasePostprocessor
+  formats: [chartok_coords,edges]  # atom_prob
+  molblock: False
+  keep_main_molecule: False
+
+evaluator:
+  _target_: src.utils.SmilesEvaluator
+  num_workers: 16
+  tanimoto: True

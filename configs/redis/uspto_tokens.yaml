@@ -1,0 +1,54 @@
+args:
+  redis_host: localhost
+  redis_port: 6379
+  redis_db: 0
+  list_name: uspto_data
+  
+  # gen_thresh: 4096  # 5120 (gpus=12)
+  # num_workers: 64  # 112 (gpus=12)
+
+  # gen_thresh: 5120  #(gpus=12)
+  # num_workers: 42  #(gpus=12)
+  
+  gen_thresh: 16  #(gpus=12)
+  num_workers: 1  #(gpus=12)
+
+  sleep_interval: 0.005
+  time_limit_for_generation: 8
+
+  src_file_dir: ${oc.env:PROJECT_ROOT}/data/
+  src_file: uspto/train_20231220.csv
+  src_file_sep: ','
+  smiles_column: smiles
+  chunk_id: 0
+
+  gen_failed_file: ${oc.env:PROJECT_ROOT}/data/redis_error.txt
+  img_dir: ${oc.env:PROJECT_ROOT}/data/uspto/imgs
+  img_format: TIF
+
+data_args:
+  all_bonds_explicit: False
+  pseudo_coords: False
+  order_strategy: random
+
+tokenizer:
+  _target_: src.tokenizer.CharTokenizer
+  path: ${oc.env:PROJECT_ROOT}/src/vocab/all_chars.json
+  coord_bins: 64
+  sep_xy: True
+  continuous_coords: False
+  max_len: 480
+  mask_ratio: 0
+  swap_token: False
+  atom_only: False
+  use_bbox: False
+  is_cxcywh: False
+  remove_script_char: False
+
+image_transform:
+    _target_: src.utils.data_utils.augment_utils.get_transforms
+    input_size:  384
+    augment: True
+    rotate: False  # True
+    debug: False
+    deformation: False

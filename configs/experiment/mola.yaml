@@ -1,0 +1,107 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - override /data: mola
+  - override /model: mola
+  - override /callbacks: default
+  - override /trainer: default
+  - override /logger: tensorboard
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags: ["char_coords","attn_edges"]
+
+seed: 1
+
+# 开了默认warm_up
+data:
+  batch_size: 24
+  train:
+    non_dynamic:  # dataset
+      # file: [uspto/train_20231124.csv]
+      # file: [pubchem/train_100.csv]
+      # len: 2800449
+      file: [uspto/train_explicit_480_20240103.csv]
+      len: 2795368
+  val:
+    non_dynamic:
+      file: [uspto/test_bc_coords_1000_20240111.csv]
+      remove_script_char: True
+      smi_col: 'smiles_tokens_exp'
+  test:
+    non_dynamic:
+      file: [uspto/test_bc_coords_1000_20240111.csv]
+      remove_script_char: True
+      smi_col: 'smiles_tokens_exp'
+  tokenizer:
+    swap_token: False
+    coord_bins: 64
+    atom_only: False
+
+model:
+  warmup: 0.015 #0.15  # 0.02 configuring learning rate, you only need to consider the batch_size for a single DDP instance
+  automatic_optimization: False
+  gradient_clip_val: 5
+  fp16: True
+  freeze_net: ''
+  encoder:
+    args:
+      pretrained:  True
+      encoder: swin_base
+      use_checkpoint: True
+  decoder:
+    args:
+      compute_confidence: True
+      tokenizer:
+        swap_token: False
+        coord_bins: 64
+        atom_only: False
+      atom_predictor:
+        tokenizer:
+          swap_token: False
+          coord_bins: 64
+          atom_only: False
+  loss:
+    atom_loss:
+      tokenizer:
+        swap_token: False
+        coord_bins: 64
+        atom_only: False
+  #   loss_weight:
+  #     chartok_coords: 2
+  #     edges: 1
+  encoder_updare_freq: 1
+  encoder_optimizer:
+    lr: 3e-4 #8e-4
+  decoder_optimizer:
+    lr: 3e-4 #8e-4
+
+trainer:
+  # precision: 16-mixed  # 16-mixed
+  devices: 1
+  detect_anomaly: False
+  # gradient_clip_val: 5.0
+
+  min_epochs: 1 # prevents early stopping
+  max_epochs: 30
+
+  # check_val_every_n_epoch: 1
+  # val_check_interval: 0
+  # num_sanity_val_steps: 0
+  
+
+  # strategy: ddp_find_unused_parameters_true # ddp_spawn
+  # strategy: ddp_spawn
+  # accelerator: auto
+
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "attn_edges"
+  aim:
+    experiment: "attn_edges"

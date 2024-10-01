@@ -1,0 +1,71 @@
+_target_: src.data.ocsr_uspto_datamodule.OCSRDataModule
+batch_size: 256
+num_workers: 16
+pin_memory: False
+
+train:
+  split: train
+  data_dir: ${paths.data_dir}
+  dynamic:  # dataset
+    file: []
+    re_gen: False
+    len: 0
+    pseudo_coords: False
+    is_dynamic: True
+  non_dynamic:  # dataset
+    file: []
+    len: 0
+    img_dir: ${paths.data_dir}
+    pseudo_coords: True
+    is_dynamic: False
+  transform:
+    _target_: src.utils.data_utils.augment_utils.get_transforms
+    input_size:  384
+    augment: True
+    rotate: False
+    debug: False
+
+val:
+  split: test
+  data_dir: ${paths.data_dir}
+  dynamic:
+    file: []
+    len: 0
+  non_dynamic:
+    file: [real/USPTO.csv]
+    img_dir: ${paths.data_dir}
+    pseudo_coords: True
+    is_dynamic: False
+  transform:
+    _target_: src.utils.data_utils.augment_utils.get_transforms
+    input_size:  384
+    augment: False
+    rotate: False
+    debug: False
+
+test:
+  split: test
+  data_dir: ${paths.data_dir}
+  dynamic:
+    file: []
+    len: 0
+  non_dynamic:
+    file: [uspto/test.csv]
+    img_dir: ${paths.data_dir}
+    pseudo_coords: True
+    is_dynamic: False
+  transform:
+    _target_: src.utils.data_utils.augment_utils.get_transforms
+    input_size:  384
+    augment: False
+    rotate: False
+    debug: False
+
+tokenizer:
+    _target_: src.tokenizer.CharTokenizer
+    path: ${paths.root_dir}/src/vocab/vocab_chars.json
+    coord_bins: 64
+    sep_xy: True
+    continuous_coords: False
+    max_len: 480
+    mask_ratio: 0

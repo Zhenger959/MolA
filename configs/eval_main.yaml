@@ -1,0 +1,19 @@
+# @package _global_
+
+defaults:
+  - _self_
+  - data: mola_test #ocsr_redis_for_test # choose datamodule with `test_dataloader()` for evaluations
+  - model: ocsr
+  - logger: null
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+  - experiment: eval_main
+  
+task_name: "test"
+
+tags: ["dev"]
+
+# passing checkpoint path is necessary for evaluation
+ckpt_path: null

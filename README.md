@@ -2,7 +2,7 @@
  * @Author: Jiaxin Zheng
  * @Date: 2024-10-01 19:19:48
  * @LastEditors: Jiaxin Zheng
- * @LastEditTime: 2024-10-01 21:09:40
+ * @LastEditTime: 2024-10-01 21:21:16
  * @Description: 
 -->
 
@@ -18,6 +18,8 @@ Key Contributions:
 
 MolA effectively addresses issues such as atom misclassification and incorrect bond predictions, providing a robust solution for pharmaceutical OCSR applications by reducing operational burdens and enhancing accuracy.
 
+![](docs/main.png)
+
 # Quick Start
 
 ```
@@ -32,7 +34,6 @@ conda activate mola
 # install requirements
 pip install -r requirements.txt
 ```
-
 
 # Data
 
